@@ -71,6 +71,7 @@ def main(id):
     print("this will take some time!")
     werdios_groups = []
     werdios_groups_names = []
+    werdios_ids = []
     for i in werdios:
             print("Let's get these guy's groups and compare them to each others joined ones.")
             response_groups = requests.get(f"https://groups.roblox.com/v1/users/{i}/groups/roles?includeLocked=true")
@@ -78,6 +79,7 @@ def main(id):
             for entry in response_groups['data']:
                 werdios_groups.append(entry['group']['id'])
                 werdios_groups_names.append(entry['group']['name'])
+                werdios_ids.append(i)
                 
                 print("werdios groups:\n")
                 print(werdios_groups_names)
@@ -98,6 +100,7 @@ def main(id):
     print(common)
     print("\nwerdios:\n")
     print(werdios)
+    
             
        
 

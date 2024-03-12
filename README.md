@@ -8,7 +8,6 @@ Potential future features include:
 
 Important considerations:
 
-    Currently, this tool does not search through individual user profiles.
     Due to precautions against rate limiting, the tool operates at a slower pace.
     It's essential to manually verify flagged users as the tool may not be accurate in all cases.
 

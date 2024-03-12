@@ -59,7 +59,7 @@ def main(id):
     for i in display_names_list:
         ### Yeah, searching is fun!!! ## 
         
-        if "bbc" in str(i) or "czm" in str(i) or "czmdump" in str(i) or "bunny" in str(i) or "bun" in str(i)  or "fill" in str(i)  or "sus" in str(i) or "doll" in str(i) or "love" in str(i) or "bxnny" in str(i) or "bull" in str(i) or "bxll" in str(i) or "luv" in str(i) or "bulls" in str(i) or "buIIs" in str(i) or "buII" in str(i) or "hearts" in str(i) or "Hearts" in str(i) or "mine" in str(i):
+        if "bbc" in str(i) or "czm" in str(i) or "czmdump" in str(i) or "bunny" in str(i) or "bun" in str(i)  or "fill" in str(i)  or "sus" in str(i) or "doll" in str(i) or "love" in str(i) or "bxnny" in str(i) or "bull" in str(i) or "bxll" in str(i) or "luv" in str(i) or "bulls" in str(i) or "buIIs" in str(i) or "buII" in str(i) or "hearts" in str(i) or "Hearts" in str(i) or "mine" in str(i) or "12yr" in str(i):
             print("found a werid username INVESTIGATE BEFORE REPORTING THESE ACCOUNTS!!!")
             werdios.append(ids[display_names_list.index(i)])
             names_of_werdios.append(i)
@@ -93,11 +93,14 @@ def main(id):
         
     
         
-    print("Gottem, found these groups!\nignore the small numbers!")
+    print("Gottem, found these groups!\nIgnore the small numbers!\n")
     common = group_id_count.most_common(11)
     print(common)
+    print("\nwerdios:\n")
+    print(werdios)
             
        
+
 
 
 if __name__ == "__main__":

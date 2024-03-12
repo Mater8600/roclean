@@ -67,41 +67,13 @@ def main(id):
             print("full list (ids):\n")
             print(werdios)
             
-            
-            
-            
-        
-                
-                
-    
-            
-            
-            
-    
-    
-    
-    
-            
-
-
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
+             
 
 if __name__ == "__main__":
-    url = input("Enter the id: ")
+    id = input("Enter the id: ")
   
         
-    main(url)
+    main(id)
         
        
     print("Done")

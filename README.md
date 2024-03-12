@@ -5,6 +5,7 @@ Potential future features include:
     Searching through a user's groups for flagged ones. (This one has been implmented, but needs further testing)
     Enhanced logging and variable management.
     Streamlined code for improved efficiency.
+    Maybe a google collab?
 
 Important considerations:
 

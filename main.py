@@ -95,8 +95,8 @@ def main(id):
         
     
         
-    print("Gottem, found these groups!\nIgnore the small numbers!\n")
-    common = group_id_count.most_common(11)
+    print("Gottem, found these groups!\nThe small numbers mean that's how many time they've been spotted\n")
+    common = group_id_count.most_common(20)
     print(common)
     print("\nwerdios:\n")
     print(werdios)

@@ -5,15 +5,6 @@ import re
 #### Made by "all" ####
 ### Heavily inspired by Ruben sim ###
 
-print("""
-█▀█ █▀█ █▀▀ █░░ ▄▀█ █▀▀ █▀▀ █▀▀ █▀█
-█▀▄ █▄█ █▀░ █▄▄ █▀█ █▄█ █▄█ ██▄ █▀▄
-""")
-print("""
-█▄▄ █▄█   ▄▀█ █░░ █░░
-█▄█ ░█░   █▀█ █▄▄ █▄▄
-""")
-
 
 
 ##### some varibles you can change ####
@@ -30,14 +21,20 @@ list_of_common_usernames = ["bbc", "czm", "czmdump", "bunny", "bun", "fill", "su
                             "bxnny", "bull", "bxll", "luv", "bulls", "buIIs", "buII", "hearts", "Hearts",
                             "mine", "12yr", "cxm", "ass", "a33", "fap", "reps"]
 
+print("""
+█▀█ █▀█ █▀▀ █░░ ▄▀█ █▀▀ █▀▀ █▀▀ █▀█
+█▀▄ █▄█ █▀░ █▄▄ █▀█ █▄█ █▄█ ██▄ █▀▄
+""")
+print("""
+█▄▄ █▄█   ▄▀█ █░░ █░░
+█▄█ ░█░   █▀█ █▄▄ █▄▄
+""")
+
 
 def main(id):
     get_req = requests.get(f"https://groups.roblox.com/v1/groups/{id}/users?limit=100&sortOrder=Asc")
-    print(get_req.json())
-    
-            
+    print(get_req.json())    
     response = get_req.json()
-    
     display_names_list = []
     ids = []
     usernames = []
@@ -71,10 +68,8 @@ def main(id):
             
 
     print("\nList of names:\n\n")
-    print(display_names_list)
-    
+    print(display_names_list)  
     ### Now to check the usernames for "sus" words ###
-    
     werdios = []
     names_of_werdios = []
     for i in display_names_list:
@@ -122,9 +117,6 @@ def main(id):
     print("\nwerdios:\n")
     print(werdios)
     
-    
-    
-    
     print("converting to userlinks for ease of use!\n\n")
     
     for i in werdios:
@@ -136,14 +128,13 @@ def main(id):
         cleaned = re.sub(r"\(\)", '', str(i))
         print(f"https://www.roblox.com/groups/{cleaned}" + " How many are in this group: " + str(count) )
 
-
-
 if __name__ == "__main__":
-    url = input("Enter the id: ")
+    url = input("Enter the id: ")  
     main(url)
-
     print("Done\nPlease make sure to check the flagged users ids")
     
-
+    
+    
+    
  
     

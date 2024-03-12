@@ -1,22 +1,15 @@
-# termtool
-This tool helps roblox terminators find werid usernames in large groups. It is an attempt to catch "weridos" on the platform, and provide a safer, cleaner enviorment on Roblox.
-This was coded pretty quickly,so there are mistakes. Please let me know if you have any suggestions :)
+This tool assists Roblox moderators in identifying peculiar usernames within large groups. Its purpose is to detect individuals with unconventional usernames on the platform, thereby contributing to a safer and more wholesome environment on Roblox. Since it was developed quickly, there may be some errors present. Your suggestions for improvement are welcome.
 
+Potential future features include:
 
-Some features that may come in the future:
-1) Searching through a User's groups for flagged ones
-2) Better logging, and better varibles
-3) Less code
+    Searching through a user's groups for flagged ones.
+    Enhanced logging and variable management.
+    Streamlined code for improved efficiency.
 
+Important considerations:
 
+    Currently, this tool does not search through individual user profiles.
+    Due to precautions against rate limiting, the tool operates at a slower pace.
+    It's essential to manually verify flagged users as the tool may not be accurate in all cases.
 
-
-
-Some things to note:
-
-1) This doesn't search through users (yet!)
-2) This is very slow, to avoid rate limting
-3) This isn't going to be right all of the time, so please check the flagged users
-
-
-IF YOU GET INTO ANY TROUBLE USING THIS IT'S NOT MY PROBLEM!
+DISCLAIMER: The developer does not assume responsibility for any issues encountered while using this tool.

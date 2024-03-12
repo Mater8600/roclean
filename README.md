@@ -14,6 +14,6 @@ Important considerations:
 
 Requirements:
 
-    json requests Counter
+    json requests Counter re
 
 DISCLAIMER: The developer does not assume responsibility for any issues encountered while using this tool.

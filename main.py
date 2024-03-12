@@ -94,7 +94,7 @@ def main(id):
     
         
     print("Gottem, found these groups!")
-    common = group_id_count.most_common(2)
+    common = group_id_count.most_common(10)
     print(common)
             
        

@@ -70,5 +70,7 @@ Example output when using the terming gods group's id (33933104) with 50 pages o
     Done
     Please make sure to check the flagged users ids
 
+You may notice that a ton of actual good accounts got flagged, that's because some of the words in the flaglist believed that the account was bad
+
 
 DISCLAIMER: The developer does not assume responsibility for any issues encountered while using this tool.

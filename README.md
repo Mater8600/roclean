@@ -2,7 +2,7 @@ This tool assists Roblox terminators in identifying peculiar usernames within la
 
 Potential future features include:
 
-   ✅ Searching through a user's groups for flagged ones.
+    Searching through a user's groups for flagged ones. (This one has been implmented, but needs further testing)
     Enhanced logging and variable management.
     Streamlined code for improved efficiency.
 

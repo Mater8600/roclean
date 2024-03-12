@@ -1,6 +1,8 @@
 import requests 
 import time
 from collections import Counter
+
+import re
 #### Made by "all" ####
 ### Heavily inspired by Ruben sim ###
 
@@ -13,6 +15,18 @@ print("""
 █▄█ ░█░   █▀█ █▄▄ █▄▄
 """)
 
+
+
+##### some varibles you can change ####
+
+### pages is how many pages the tool will search through default = 10 ###
+pages = 10
+### page delay is how long we will wait before checking another page for "sus" usernames make sure to turn it up if you are scraping a ton of pages!!! default=2 ###
+page_delay = 2
+
+### 4 seconds is good enough for most big numbers, but I can assure you it will take forever!
+
+
 def main(id):
     get_req = requests.get(f"https://groups.roblox.com/v1/groups/{id}/users?limit=100&sortOrder=Asc")
     print(get_req.json())
@@ -22,6 +36,7 @@ def main(id):
     
     display_names_list = []
     ids = []
+    usernames = []
     for entry in response['data']:
                 ids.append(entry['user']['userId'])
     for entry in response['data']:
@@ -30,8 +45,8 @@ def main(id):
     next_page = response['nextPageCursor']
     
     print(next_page)
-    print("We going to scroll through a few pages for the most people, and to avoid burner acconnts...")
-    for i in range(10):
+    print("We going to scroll through a few pages for the most people, and to avoid burner accounts...\nThis will take a while depending on the page value!!")
+    for i in range(pages):
         try:
             
             get_req = requests.get(f"https://groups.roblox.com/v1/groups/{id}/users?limit=100&cursor={next_page}&sortOrder=Asc")
@@ -41,9 +56,11 @@ def main(id):
                 display_names_list.append(entry['user']['displayName'])
             for entry in response['data']:
                 ids.append(entry['user']['userId'])
+            
+                
             next_page = response['nextPageCursor']
             print(next_page)
-            time.sleep(2)
+            time.sleep(page_delay)
         except:
             print("no such page exists, going forward without any extra :(")
         
@@ -59,8 +76,8 @@ def main(id):
     for i in display_names_list:
         ### Yeah, searching is fun!!! ## 
         
-        if "bbc" in str(i) or "czm" in str(i) or "czmdump" in str(i) or "bunny" in str(i) or "bun" in str(i)  or "fill" in str(i)  or "sus" in str(i) or "doll" in str(i) or "love" in str(i) or "bxnny" in str(i) or "bull" in str(i) or "bxll" in str(i) or "luv" in str(i) or "bulls" in str(i) or "buIIs" in str(i) or "buII" in str(i) or "hearts" in str(i) or "Hearts" in str(i) or "mine" in str(i) or "12yr" in str(i):
-            print("found a werid username INVESTIGATE BEFORE REPORTING THESE ACCOUNTS!!!")
+        if "bbc" in str(i) or "czm" in str(i) or "czmdump" in str(i) or "bunny" in str(i) or "bun" in str(i)  or "fill" in str(i)  or "sus" in str(i) or "doll" in str(i) or "Bawls" in str(i) or "bxnny" in str(i) or "bull" in str(i) or "bxll" in str(i) or "luv" in str(i) or "bulls" in str(i) or "buIIs" in str(i) or "buII" in str(i) or "hearts" in str(i) or "Hearts" in str(i) or "mine" in str(i) or "12yr" in str(i) or "cxm" in str(i) or "ass" in str(i) or "a33" in str(i) or "fap" in str(i) or "reps" in str(i):
+            print("found a werid display username INVESTIGATE BEFORE REPORTING THESE ACCOUNTS!!!")
             werdios.append(ids[display_names_list.index(i)])
             names_of_werdios.append(i)
             print("werdios:\n")
@@ -95,17 +112,28 @@ def main(id):
         
     
         
-    print("Gottem, found these groups!\nThe small numbers mean that's how many time they've been spotted\n")
+    print("Gottem, found these groups!\nIgnore the small numbers!\n")
     common = group_id_count.most_common(20)
     print(common)
     print("\nwerdios:\n")
     print(werdios)
     
-            
-       
+    
+    
+    
+    print("converting to userlinks for ease of use!\n\n")
+    
+    for i in werdios:
+        print(f"https://www.roblox.com/users/{i}/profile")
+        
+    print("\ncommmon groups\n")
+    
+    for i, count in common:
+        cleaned = re.sub(r"\(\)", '', str(i))
+        print(f"https://www.roblox.com/groups/{cleaned}" + " How many are in this group: " + str(count) )
 
 
-
+#
 if __name__ == "__main__":
     url = input("Enter the id: ")
   
@@ -113,6 +141,11 @@ if __name__ == "__main__":
     main(url)
         
        
-    print("Done")
+    print("Done\nPlease make sure to check the flagged users ids")
+    
+    
+    
+    
+    
  
     

@@ -12,4 +12,9 @@ Important considerations:
     Due to precautions against rate limiting, the tool operates at a slower pace.
     It's essential to manually verify flagged users as the tool may not be accurate in all cases.
 
+
+Requirements:
+
+    json requests
+
 DISCLAIMER: The developer does not assume responsibility for any issues encountered while using this tool.

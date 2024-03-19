@@ -10,12 +10,11 @@ import threading
 
 ##### some varibles you can change ####
 
-### pages is how many pages the tool will search through default = 10 ###
-pages = 80
-### page delay is how long we will wait before checking another page for "sus" usernames make sure to turn it up if you are scraping a ton of pages!!! default=2 ###
-page_delay = 1
+### pages is how many pages the tool will search through default = 100 ###
 
-### 4 seconds is good enough for most big numbers, but I can assure you it will take forever!
+### this number can vary, if you want a full group scan just do 1000, but it will take forever
+pages = 1000
+
 
 ### the list of "sus" words ###
 list_of_common_usernames = ["bbc", "czm", "czmdump", "bunny", "bun", "fill", "sus", "doll", "Bawls",
@@ -63,47 +62,22 @@ def analyzeusers(i,werdios,names_of_werdios,ids,display_names_list):
 
 
 def check_groups(i,werdios_groups,werdios_groups_names,werdios_ids,werdios):
-    print("Groups are going to be checked!")
-    print("Let's get these guy's groups and compare them to each others joined ones.")
-    response_groups = requests.get(f"https://groups.roblox.com/v1/users/{i}/groups/roles?includeLocked=true")
-    response_groups = response_groups.json()
-    for entry in response_groups['data']:
-            werdios_groups.append(entry['group']['id'])
-            werdios_groups_names.append(entry['group']['name'])
-            werdios_ids.append(i)
-                
-            print("werdios groups:\n")
-            print(werdios_groups_names)
-            print("werdios group ids")
-            print(werdios_groups)
-            print("ok, cont")
+    try:
+        response_groups = requests.get(f"https://groups.roblox.com/v1/users/{i}/groups/roles?includeLocked=true")
+        response_groups = response_groups.json()
+        for entry in response_groups['data']:
+                werdios_groups.append(entry['group']['id'])
+                werdios_groups_names.append(entry['group']['name'])
+                werdios_ids.append(i)
+                    
+                print("werdios groups:\n")
+                print(werdios_groups_names)
+                print("werdios group ids")
+                print(werdios_groups)
+    except:
+        print("Uh oh!")
 
-            group_id_count = Counter(werdios_groups)
             
-            print("\n\n\nGroup counts\n")
-            print(group_id_count)
-                
-            print("Comparing rn...")
-                
-            
-                
-            print("\n\n\n\n\n\n\n\n\nGottem, found these groups!\nIgnore the small numbers!\n")
-            common = group_id_count.most_common(40)
-            print(common)
-            print("\nwerdios:\n")
-            print(werdios)
-            
-            print("converting to userlinks for ease of use!\n\n")
-            
-            for i in werdios:
-                print(f"https://www.roblox.com/users/{i}/profile")
-                
-            print("\ncommmon groups\n")
-            
-            for i, count in common:
-                cleaned = re.sub(r"\(\)", '', str(i))
-                print(f"https://www.roblox.com/groups/{cleaned}" + " How many are in this group: " + str(count) )
-    
 
 def main(id):
     get_req = requests.get(f"https://groups.roblox.com/v1/groups/{id}/users?limit=100&sortOrder=Asc")
@@ -122,6 +96,7 @@ def main(id):
     print(next_page)
     print("We going to scroll through a few pages for the most people, and to avoid burner accounts...\nThis will take a while depending on the page value!!")
     for i in range(pages):
+        print(f"Page: {i}")
         try:
             get_req = requests.get(f"https://groups.roblox.com/v1/groups/{id}/users?limit=100&cursor={next_page}&sortOrder=Asc")
             response = get_req.json()
@@ -130,6 +105,7 @@ def main(id):
             threading.Thread(target=pager_scroller,args=(next_page,display_names_list,ids,response,)).start()
         except:
             print("done doing the requests")
+            break
     
         
 
@@ -152,8 +128,45 @@ def main(id):
     werdios_groups_names = []
     werdios_ids = []
     for i in werdios:
+            
             threading.Thread(target=check_groups,args=(i,werdios_groups,werdios_groups_names,werdios_ids,werdios,)).start()
             
+    
+    while True:
+        active_threads = threading.active_count()
+        if active_threads <= 1:
+            print("\nthreads ded")
+        
+            
+            group_id_count = Counter(werdios_groups)
+                    
+            print("\n\n\nGroup counts\n")
+            print(group_id_count)
+                        
+            print("Comparing rn...")
+                        
+                    
+                        
+            print("Gottem, found these groups!\nIgnore the small numbers!\n")
+            common = group_id_count.most_common(40)
+            print(common)
+            print("\nwerdios:\n")
+            print(werdios)
+                    
+            print("\n\n\n\n\n\nconverting to userlinks for ease of use!\n")
+                    
+            for i in werdios:
+                print(f"https://www.roblox.com/users/{i}/profile")
+                        
+            print("\ncommmon groups\n")
+                    
+            for i, count in common:
+                cleaned = re.sub(r"\(\)", '', str(i))
+                print(f"https://www.roblox.com/groups/{cleaned}" + " How many are in this group: " + str(count) )
+            
+
+            break
+                    
           
     
 

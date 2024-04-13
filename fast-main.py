@@ -19,7 +19,7 @@ pages = 1000
 ### the list of "sus" words ###
 list_of_common_usernames = ["bbc", "czm", "czmdump", "bunny", "bun", "fill", "sus", "doll", "Bawls",
                             "bxnny", "bull", "bxll", "luv", "bulls", "buIIs", "buII", "hearts", "Hearts",
-                             "12yr", "cxm", "ass", "a33", "fap", "reps"]
+                             "12yr", "cxm", "ass", "a33", "fap", "reps", "blow", "m1kies"]
 
 print("""
 █▀█ █▀█ █▀▀ █░░ ▄▀█ █▀▀ █▀▀ █▀▀ █▀█

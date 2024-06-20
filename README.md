@@ -1,11 +1,4 @@
-This tool assists Roblox terminators in identifying peculiar usernames within large groups. Its purpose is to detect individuals with unconventional usernames on the platform, thereby contributing to a safer and more wholesome environment on Roblox. Since it was developed quickly, there may be some errors present. Your suggestions for improvement are welcome.
-
-Potential future features include:
-
-    Searching through a user's groups for flagged ones. (This one has been implmented, but needs further testing)
-    Enhanced logging and variable management.
-    Streamlined code for improved efficiency.
-    Maybe a google collab?
+This tool assists Roblox terminators in identifying peculiar usernames within large groups. Its purpose is to detect individuals with unconventional usernames on the platform, thereby contributing to a safer and more wholesome environment on Roblox. Since it was developed quickly, there may be some errors present. Your suggestions for improvement are welcome. The gui version is almost completely done, just a few more quality of life improvements
 
 Important considerations:
 

@@ -17,7 +17,8 @@ def scan_bad_group(finished_lbl,id,pgs,information,information_groups):
     
     
     pages = int(pgs)
-    
+
+
     
     def pager_scroller(next_page,display_names_list,ids,response,information):
         
@@ -32,10 +33,14 @@ def scan_bad_group(finished_lbl,id,pgs,information,information_groups):
             
         for entry in response['data']:
             ids.append(entry['user']['userId'])
-        information.set(f"Usernames:\n{display_names_list}")
+        
                     
                 
-    
+        
+                
+
+        
+
     def analyzeusers(i,werdios,names_of_werdios,ids,display_names_list):
         
         if any(s in str(i) for s in list_of_common_usernames):
@@ -46,7 +51,7 @@ def scan_bad_group(finished_lbl,id,pgs,information,information_groups):
                 print(names_of_werdios)
                 print("full list (ids):\n")
                 print(werdios)
-                information.set(f"Possible user\n{names_of_werdios}")
+               
 
 
     def check_groups(i,werdios_groups,werdios_groups_names,werdios_ids,werdios):
@@ -83,6 +88,7 @@ def scan_bad_group(finished_lbl,id,pgs,information,information_groups):
     
     for i in range(pages):
         print(f"Page: {i}")
+        information.set(f"Currently scanning page: {i}")
         try:
             get_req = requests.get(f"https://groups.roblox.com/v1/groups/{id}/users?limit=100&cursor={next_page}&sortOrder=Asc")
             response = get_req.json()
@@ -99,9 +105,10 @@ def scan_bad_group(finished_lbl,id,pgs,information,information_groups):
     ### Now to check the usernames for "sus" words ###
     werdios = []
     names_of_werdios = []
+    
     for i in display_names_list:
         threading.Thread(target=analyzeusers,args=(i,werdios,names_of_werdios,ids,display_names_list,)).start()
-            
+        information.set(f"Analyzing the usernames on current username {i}")    
             
             
         
@@ -109,8 +116,9 @@ def scan_bad_group(finished_lbl,id,pgs,information,information_groups):
     werdios_groups = []
     werdios_groups_names = []
     werdios_ids = []
+
     for i in werdios:
-                
+            information.set(f"Analyzing the groups of flagged users {i}")  
             threading.Thread(target=check_groups,args=(i,werdios_groups,werdios_groups_names,werdios_ids,werdios,)).start()
                 
         
@@ -171,8 +179,8 @@ def scan_bad_group(finished_lbl,id,pgs,information,information_groups):
                     name = json_dis['displayName']
                     user_link = name + ":https://www.roblox.com/users/" + str(i) + "/profile"
                     list_of_accounts.append(user_link)
-                    information.set(f"Flagged accounts:\n{str(list_of_accounts)}\n")
                     
+            information.set(f"Flagged accounts:\n{str(list_of_accounts)}\n")        
 
             
                   
@@ -253,12 +261,7 @@ def main():
             donkey_root.mainloop()
 
 
-                
-
-                
-
-                
-    
+       
           
     def information_window_functon():
           """this is to display what is currently happening"""
@@ -326,14 +329,7 @@ def main():
             threading.Thread(target=information_window_groups_functon).start()
             make_thread(finished_lbl,text,pgs,information,information_groups) 
          
-         
-
-         
-         
-         
-            
-         
-            
+                 
         
     button_to_activate = tk.Button(master=frame,text="Run",command=get_txt).pack(fill="x", expand=True)
     

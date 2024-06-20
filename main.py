@@ -17,10 +17,6 @@ def scan_bad_group(finished_lbl,id,pgs,information,information_groups):
     
     
     pages = int(pgs)
-
-
-    
-
     
     
     def pager_scroller(next_page,display_names_list,ids,response,information):
@@ -39,11 +35,7 @@ def scan_bad_group(finished_lbl,id,pgs,information,information_groups):
         information.set(f"Usernames:\n{display_names_list}")
                     
                 
-        
-                
-
-        
-
+    
     def analyzeusers(i,werdios,names_of_werdios,ids,display_names_list):
         
         if any(s in str(i) for s in list_of_common_usernames):

@@ -7,10 +7,65 @@ import re
 import threading
 
 
+
+
+
+#██████╗░███████╗░█████╗░██████╗░███╗░░░███╗███████╗
+#██╔══██╗██╔════╝██╔══██╗██╔══██╗████╗░████║██╔════╝
+#██████╔╝█████╗░░███████║██║░░██║██╔████╔██║█████╗░░
+#██╔══██╗██╔══╝░░██╔══██║██║░░██║██║╚██╔╝██║██╔══╝░░
+#██║░░██║███████╗██║░░██║██████╔╝██║░╚═╝░██║███████╗
+#╚═╝░░╚═╝╚══════╝╚═╝░░╚═╝╚═════╝░╚═╝░░░░░╚═╝╚══════╝
+
+### HEADS UP THESE ARE SOME PRETTY BAD WORDS IN THIS SCRIPT! ###
+
+### Most if not all of the words, I "all" have found in people's usernames/diplay names. ###
+
+### These words can range from sexual indogendos to literal swear words ###
+
+### The program checks the display names, since most offenders can avoid bans by using a display name rather than entering a username ###
+
+### if there is any bugs/glitches encountered in the program, open a github issue on the project page ###
+
+### I urge you to check the flagged usernames description with gui tool provided, just click on their selection and you can for sure see if it's bad. ###
+
+### Now, continue at your own risk, I do not claim any responsiblity to anything you find, nor do I claim responsiblity for the misuse of this tool. ###
+
+
+#███████╗███╗░░██╗██████╗░░█████╗░███████╗██████╗░███████╗░█████╗░██████╗░███╗░░░███╗███████╗
+#██╔════╝████╗░██║██╔══██╗██╔══██╗██╔════╝██╔══██╗██╔════╝██╔══██╗██╔══██╗████╗░████║██╔════╝
+#█████╗░░██╔██╗██║██║░░██║██║░░██║█████╗░░██████╔╝█████╗░░███████║██║░░██║██╔████╔██║█████╗░░
+#██╔══╝░░██║╚████║██║░░██║██║░░██║██╔══╝░░██╔══██╗██╔══╝░░██╔══██║██║░░██║██║╚██╔╝██║██╔══╝░░
+#███████╗██║░╚███║██████╔╝╚█████╔╝██║░░░░░██║░░██║███████╗██║░░██║██████╔╝██║░╚═╝░██║███████╗
+#╚══════╝╚═╝░░╚══╝╚═════╝░░╚════╝░╚═╝░░░░░╚═╝░░╚═╝╚══════╝╚═╝░░╚═╝╚═════╝░╚═╝░░░░░╚═╝╚══════╝
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### BAD WORDS TO SEARCH FOR ###
 list_of_common_usernames = ["bbc", "czm", "czmdump", "bunny", "bun", "fill", "sus", "doll", "Bawls",
                                 "bxnny", "bull", "bxll", "luv", "bulls", "buIIs", "buII", "hearts", "Hearts",
-                                "12yr", "cxm", "ass", "a33", "fap", "reps", "blow", "m1kies","lov","snow","toy", "a$$"]
+                                "12yr", "cxm", "ass", "a33", "fap", "reps", "blow", "m1kies","lov","snow","toy",
+                                  "a$$", "loli","t0y","femboy", "Femboy", "cun", "4dd", "4fun", "funtime","hardr","Ag3","mommmies",
+                                  "mommies","girlsFonly","dirty","desire"]
 
+### LOOKING FOR BAD USERNAMES ###
 def scan_bad_group(finished_lbl,id,pgs,information,information_groups):
     
     print("scanning...")
@@ -144,28 +199,7 @@ def scan_bad_group(finished_lbl,id,pgs,information,information_groups):
             print(werdios)
                         
             print("\n\n\n\n\n\nconverting to userlinks for ease of use!\n")
-            def get_current_time_12h():
-                """Returns the current time in 12 hour format."""
-
-                
-                datetime_obj = time.localtime()
-
-                
-                datetime_obj = time.strftime("%H:%M:%S", datetime_obj)
-
-                
-                if int(datetime_obj[:2]) >= 12:
-                    
-                    hour = int(datetime_obj[:2]) - 12
-                    am_pm = "PM"
-                else:
-                    hour = int(datetime_obj[:2])
-                    am_pm = "AM"
-
-                
-                time_12h = f"{hour:02d}:{datetime_obj[3:5]} {am_pm}"
-
-                return time_12h
+            
 
                
                         
@@ -177,7 +211,7 @@ def scan_bad_group(finished_lbl,id,pgs,information,information_groups):
                     display_name = requests.get(f"https://users.roblox.com/v1/users/{i}")
                     json_dis = display_name.json()
                     name = json_dis['displayName']
-                    user_link = name + ":https://www.roblox.com/users/" + str(i) + "/profile"
+                    user_link = name + ": https://www.roblox.com/users/" + str(i) + "/profile"
                     list_of_accounts.append(user_link)
                     
             information.set(f"Flagged accounts:\n{str(list_of_accounts)}\n")        
@@ -283,8 +317,8 @@ def main():
                     pattern = r"['\[\],]"
 
                     data_ = re.sub(pattern,'',data)
-                    txt_lbl.set(f"Selection: {data_}")
-                    
+                    txt_lbl.set(f"Selection:  {data_}")
+            
                     
                     info_of_user_window_function(data=data_)
                     

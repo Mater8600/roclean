@@ -6,8 +6,6 @@ import threading
 #### Made by "all" ####
 ### Heavily inspired by Ruben sim ###
 
-
-
 ##### some varibles you can change ####
 
 ### pages is how many pages the tool will search through default = 100 ###
@@ -43,11 +41,7 @@ def pager_scroller(next_page,display_names_list,ids,response):
         ids.append(entry['user']['userId'])
             
                 
-            
-    
-            
-
-    
+          
 
 def analyzeusers(i,werdios,names_of_werdios,ids,display_names_list):
     
@@ -106,11 +100,7 @@ def main(id):
         except:
             print("done doing the requests")
             break
-    
-        
 
-        
-       
 
     print("\nList of names:\n\n")
     print(display_names_list)  
@@ -130,8 +120,7 @@ def main(id):
     for i in werdios:
             
             threading.Thread(target=check_groups,args=(i,werdios_groups,werdios_groups_names,werdios_ids,werdios,)).start()
-            
-    
+
     while True:
         active_threads = threading.active_count()
         if active_threads <= 1:
@@ -166,9 +155,7 @@ def main(id):
             
 
             break
-                    
-          
-    
+
 
 if __name__ == "__main__":
     url = input("Enter the id: ")  

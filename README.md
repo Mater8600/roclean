@@ -18,7 +18,7 @@ Requirements:
 Roadmap:
     
     Add more complex features to the gui, and make it more stable
-    Add argsparse to "fast-main.py" instead of the annoying system
+    Add argsparse to "fast-main.py" instead of the annoying system ✅
     Discord bot for ease of use wherever, and whenever, and with a community! (Probably not gonna happen)
     Auto report feature/ report feature
     Description checks and more output options

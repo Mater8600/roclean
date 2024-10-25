@@ -3,15 +3,14 @@ import time
 from collections import Counter
 import re
 import threading
+import argparse 
+
 #### Made by "all" ####
 ### Heavily inspired by Ruben sim ###
 
+
+
 ##### some varibles you can change ####
-
-### pages is how many pages the tool will search through default = 100 ###
-
-### this number can vary, if you want a full group scan just do 1000, but it will take forever
-pages = 1000
 
 
 ### the list of "sus" words ###
@@ -19,8 +18,20 @@ list_of_common_usernames = ["bbc", "czm", "czmdump", "bunny", "bun", "fill", "su
                                 "bxnny", "bull", "bxll", "luv", "bulls", "buIIs", "buII", "hearts", "Hearts",
                                 "12yr", "cxm", "ass", "a33", "fap", "reps", "blow", "m1kies","lov","snow","toy",
                                   "a$$", "loli","t0y","femboy", "Femboy", "cun", "4dd", "4fun", "funtime","hardr","Ag3","mommmies",
-                                  "mommies","girlsFonly","dirty","desire", "fvta", "caked", "trading", "czvuzm", "guts"]
+                                  "mommies","girlsFonly"]
 
+werdios_groups = []
+werdios_groups_names = []
+werdios_ids = []
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument("-i", "--id", help="The to use to pwn the groups")
+parser.add_argument("-v", "--verbose", help="Be Verbose")
+parser.add_argument("-p", "--pages", help="How many pages of the group you want to pwn default 100",default=100)
+
+args = parser.parse_args()
+pages = int(args.pages)
 print("""
 █▀█ █▀█ █▀▀ █░░ ▄▀█ █▀▀ █▀▀ █▀▀ █▀█
 █▀▄ █▄█ █▀░ █▄▄ █▀█ █▄█ █▄█ ██▄ █▀▄
@@ -34,7 +45,6 @@ def pager_scroller(next_page,display_names_list,ids,response):
     
     
     print("Scrolling thru the pages")
-    
     print(next_page)
     
     for entry in response['data']:
@@ -43,7 +53,11 @@ def pager_scroller(next_page,display_names_list,ids,response):
         ids.append(entry['user']['userId'])
             
                 
-          
+            
+    
+            
+
+    
 
 def analyzeusers(i,werdios,names_of_werdios,ids,display_names_list):
     
@@ -65,11 +79,16 @@ def check_groups(i,werdios_groups,werdios_groups_names,werdios_ids,werdios):
                 werdios_groups.append(entry['group']['id'])
                 werdios_groups_names.append(entry['group']['name'])
                 werdios_ids.append(i)
+                
+                if args.verbose != None:
+                    print("werdios groups:\n")
+                    print(werdios_groups_names)
+                    print("werdios group ids")
+                    print(werdios_groups)
+                else:
+                    print("Checking the flagged users please wait...")
+                    print("Total amount flagged "+str(len(werdios_groups_names)))
                     
-                print("werdios groups:\n")
-                print(werdios_groups_names)
-                print("werdios group ids")
-                print(werdios_groups)
     except:
         print("Uh oh!")
 
@@ -102,7 +121,11 @@ def main(id):
         except:
             print("done doing the requests")
             break
+    
+        
 
+        
+       
 
     print("\nList of names:\n\n")
     print(display_names_list)  
@@ -116,13 +139,12 @@ def main(id):
         
        
     print("this will take some time!")
-    werdios_groups = []
-    werdios_groups_names = []
-    werdios_ids = []
+ 
     for i in werdios:
+            #threading.Thread(target=check_groups,args=(i,werdios_groups,werdios_groups_names,werdios_ids,werdios,)).start()
+            check_groups(i,werdios_groups,werdios_groups_names,werdios_ids,werdios)
             
-            threading.Thread(target=check_groups,args=(i,werdios_groups,werdios_groups_names,werdios_ids,werdios,)).start()
-
+    
     while True:
         active_threads = threading.active_count()
         if active_threads <= 1:
@@ -145,9 +167,9 @@ def main(id):
             print(werdios)
                     
             print("\n\n\n\n\n\nconverting to userlinks for ease of use!\n")
-                    
-            for i in werdios:
-                print(f"https://www.roblox.com/users/{i}/profile")
+            
+            for i, c in zip(werdios, range(1, len(werdios)+1)):
+                print(f"{c}. https://www.roblox.com/users/{i}/profile")
                         
             print("\ncommmon groups\n")
                     
@@ -157,12 +179,13 @@ def main(id):
             
 
             break
+                    
 
+    
+if args.id != None:
+      main(args.id)
+      print("Done\nPlease make sure to check the flagged users ids")
 
-if __name__ == "__main__":
-    url = input("Enter the id: ")  
-    main(url)
-    print("Done\nPlease make sure to check the flagged users ids")
  
     
  

@@ -8,8 +8,6 @@ import argparse
 #### Made by "all" ####
 ### Heavily inspired by Ruben sim ###
 
-
-
 ##### some varibles you can change ####
 
 
@@ -18,8 +16,11 @@ list_of_common_usernames = ["bbc", "czm", "czmdump", "bunny", "bun", "fill", "su
                                 "bxnny", "bull", "bxll", "luv", "bulls", "buIIs", "buII", "hearts", "Hearts",
                                 "12yr", "cxm", "ass", "a33", "fap", "reps", "blow", "m1kies","lov","snow","toy",
                                   "a$$", "loli","t0y","femboy", "Femboy", "cun", "4dd", "4fun", "funtime","hardr","Ag3","mommmies",
-                                  "mommies","girlsFonly"]
+                                  "mommies","girlsFonly", "Roblox"]
 
+
+
+list_of_common_descriptions = ["Welcome!"]
 werdios_groups = []
 werdios_groups_names = []
 werdios_ids = []
@@ -32,10 +33,12 @@ parser.add_argument("-p", "--pages", help="How many pages of the group you want 
 
 args = parser.parse_args()
 pages = int(args.pages)
+
 print("""
-█▀█ █▀█ █▀▀ █░░ ▄▀█ █▀▀ █▀▀ █▀▀ █▀█
-█▀▄ █▄█ █▀░ █▄▄ █▀█ █▄█ █▄█ ██▄ █▀▄
+█▀█ █▀█ █▀▀ █░░ █▀▀ ▄▀█ █▄░█
+█▀▄ █▄█ █▄▄ █▄▄ ██▄ █▀█ █░▀█
 """)
+
 print("""
 █▄▄ █▄█   ▄▀█ █░░ █░░
 █▄█ ░█░   █▀█ █▄▄ █▄▄
@@ -185,7 +188,10 @@ def main(id):
 if args.id != None:
       main(args.id)
       print("Done\nPlease make sure to check the flagged users ids")
-
+      print("Bye bye see you soon!")
+else:
+     parser.print_help()
+     print("Bye bye see you soon!")
  
     
  

@@ -20,7 +20,6 @@ list_of_common_usernames = ["bbc", "czm", "czmdump", "bunny", "bun", "fill", "su
 
 
 
-list_of_common_descriptions = ["Welcome!"]
 werdios_groups = []
 werdios_groups_names = []
 werdios_ids = []
@@ -46,10 +45,7 @@ print("""
 
 def pager_scroller(next_page,display_names_list,ids,response):
     
-    
-    print("Scrolling thru the pages")
-    print(next_page)
-    
+
     for entry in response['data']:
         display_names_list.append(entry['user']['displayName'])
     for entry in response['data']:
@@ -65,15 +61,17 @@ def pager_scroller(next_page,display_names_list,ids,response):
 def analyzeusers(i,werdios,names_of_werdios,ids,display_names_list):
     
     if any(s in str(i) for s in list_of_common_usernames):
-            print("found a werid display username INVESTIGATE BEFORE REPORTING THESE ACCOUNTS!!!")
+            
             werdios.append(ids[display_names_list.index(i)])
             names_of_werdios.append(i)
-            print("werdios:\n")
-            print(names_of_werdios)
-            print("full list (ids):\n")
-            print(werdios)
+            if args.verbose != None:
+                print("werdios:\n")
+                print(names_of_werdios)
+                print("full list (ids):\n")
+                print(werdios)
+                print(f"Amount of flagged users {len(names_of_werdios)}\n")
 
-
+            print(f"Amount of flagged users {len(names_of_werdios)}\n")
 def check_groups(i,werdios_groups,werdios_groups_names,werdios_ids,werdios):
     try:
         response_groups = requests.get(f"https://groups.roblox.com/v1/users/{i}/groups/roles?includeLocked=true")
@@ -89,8 +87,8 @@ def check_groups(i,werdios_groups,werdios_groups_names,werdios_ids,werdios):
                     print("werdios group ids")
                     print(werdios_groups)
                 else:
-                    print("Checking the flagged users please wait...")
-                    print("Total amount flagged "+str(len(werdios_groups_names)))
+                    
+                    print("Total amount of users groups flagged "+str(len(werdios_groups_names)))
                     
     except:
         print("Uh oh!")
@@ -99,11 +97,11 @@ def check_groups(i,werdios_groups,werdios_groups_names,werdios_ids,werdios):
 
 def main(id):
     get_req = requests.get(f"https://groups.roblox.com/v1/groups/{id}/users?limit=100&sortOrder=Asc")
-    print(get_req.json())    
+      
     response = get_req.json()
     display_names_list = []
     ids = []
-    usernames = []
+    
     for entry in response['data']:
                 ids.append(entry['user']['userId'])
     for entry in response['data']:
@@ -111,10 +109,15 @@ def main(id):
         
     next_page = response['nextPageCursor']
     
-    print(next_page)
+    
     print("We going to scroll through a few pages for the most people, and to avoid burner accounts...\nThis will take a while depending on the page value!!")
-    for i in range(pages):
-        print(f"Page: {i}")
+    for i in range(pages+1):
+        if args.verbose != None:
+
+            print(f"Scrolling through the pages. Next page Cursor: {next_page}")
+            
+        else:
+            print(f"Scrolling through the pages! Current page: {i}")
         try:
             get_req = requests.get(f"https://groups.roblox.com/v1/groups/{id}/users?limit=100&cursor={next_page}&sortOrder=Asc")
             response = get_req.json()
@@ -129,9 +132,11 @@ def main(id):
 
         
        
-
-    print("\nList of names:\n\n")
-    print(display_names_list)  
+    if  args.verbose != None:
+        print("\nList of names:\n\n")
+        print(display_names_list)  
+    else:
+        print(f"Amount of users in the group:{len(display_names_list)}")
     ### Now to check the usernames for "sus" words ###
     werdios = []
     names_of_werdios = []
@@ -151,7 +156,6 @@ def main(id):
     while True:
         active_threads = threading.active_count()
         if active_threads <= 1:
-            print("\nthreads ded")
         
             
             group_id_count = Counter(werdios_groups)
@@ -159,16 +163,8 @@ def main(id):
             print("\n\n\nGroup counts\n")
             print(group_id_count)
                         
-            print("Comparing rn...")
-                        
-                    
-                        
-            print("Gottem, found these groups!\nIgnore the small numbers!\n")
             common = group_id_count.most_common(40)
-            print(common)
-            print("\nwerdios:\n")
-            print(werdios)
-                    
+            
             print("\n\n\n\n\n\nconverting to userlinks for ease of use!\n")
             
             for i, c in zip(werdios, range(1, len(werdios)+1)):

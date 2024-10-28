@@ -61,7 +61,6 @@ python roclean.py --id 123456 --pages 10
 
 ## 📊 Output Format
 The tool will generate a report containing:
-- Scan timestamp
 - Group information
 - Flagged accounts (if any)
 - Scanning statistics

@@ -51,12 +51,6 @@ def pager_scroller(next_page,display_names_list,ids,response):
     for entry in response['data']:
         ids.append(entry['user']['userId'])
             
-                
-            
-    
-            
-
-    
 
 def analyzeusers(i,werdios,names_of_werdios,ids,display_names_list):
     
@@ -128,9 +122,7 @@ def main(id):
             print("done doing the requests")
             break
     
-        
 
-        
        
     if  args.verbose != None:
         print("\nList of names:\n\n")
@@ -157,15 +149,9 @@ def main(id):
         active_threads = threading.active_count()
         if active_threads <= 1:
         
-            
-            group_id_count = Counter(werdios_groups)
-                    
-            print("\n\n\nGroup counts\n")
-            print(group_id_count)
-                        
+            group_id_count = Counter(werdios_groups)             
             common = group_id_count.most_common(40)
-            
-            print("\n\n\n\n\n\nconverting to userlinks for ease of use!\n")
+            print("\n\n\n\n\n\nconverting to user and groups links for ease of use!\n")
             
             for i, c in zip(werdios, range(1, len(werdios)+1)):
                 print(f"{c}. https://www.roblox.com/users/{i}/profile")
@@ -175,8 +161,7 @@ def main(id):
             for i, count in common:
                 cleaned = re.sub(r"\(\)", '', str(i))
                 print(f"https://www.roblox.com/groups/{cleaned}" + " How many are in this group: " + str(count) )
-            
-
+          
             break
                     
 

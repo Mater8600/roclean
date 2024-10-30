@@ -16,7 +16,7 @@ list_of_common_usernames = ["bbc", "czm", "czmdump", "bunny", "bun", "fill", "su
                                 "bxnny", "bull", "bxll", "luv", "bulls", "buIIs", "buII", "hearts", "Hearts",
                                 "12yr", "cxm", "ass", "a33", "fap", "reps", "blow", "m1kies","lov","snow","toy",
                                   "a$$", "loli","t0y","femboy", "Femboy", "cun", "4dd", "4fun", "funtime","hardr","Ag3","mommmies",
-                                  "mommies","girlsFonly", "Roblox"]
+                                  "mommies","girlsFonly", "trade", "trding","studio"]
 
 
 

@@ -69,7 +69,7 @@ The tool will generate a report containing:
 RoClean uses several factors to identify potentially suspicious accounts:
 - Group joining patterns
 - Public profile indicators
-- Description checks (roadmap)
+- Description checks
 
 *Note: Specific detection criteria are intentionally omitted to prevent abuse.*
 

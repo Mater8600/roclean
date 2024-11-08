@@ -1,13 +1,15 @@
 import requests
 import argparse
 
+
+###THIS TOOL IS USED TO CHECK IDS THAT IS ALL! ###
 ### TO DO 
 ### ADD GROUP CHECK TO USER SEARCH
 ### FRIENDS CHECK
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("-i", "--id", help="The id of user to specifiy required")
+parser.add_argument("-i", "--id", help="The id of user to specifiy (required)")
 
 
 args = parser.parse_args()

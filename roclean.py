@@ -69,10 +69,13 @@ def description_check(normal,werdios_ids,names_of_werdios,ids,display_names_list
             get_userinfo= requests.get(f"https://users.roblox.com/v1/users/{userid}").json()
             description = get_userinfo["description"]
             #is_banned_user = get_userinfo["isBanned"] ## soon
-            if description == None:
+            if description == "description":
+                 
+
                  if verbose == True:
                     print("No description to check!")
                     return 
+                 return
             if any(s in str(description) for s in list_of_common_description):
                 if verbose != None:
                     print(f"Flagged!: {normal}")
@@ -81,7 +84,7 @@ def description_check(normal,werdios_ids,names_of_werdios,ids,display_names_list
                 reason_for_flag.append(description)
                 #is_banned.append(is_banned_user) ## soon
 
-                time.sleep(.2) ### Delay to prevent rate limiting
+                time.sleep(.3) ### Delay to prevent rate limiting
   
             else:
                 print(f"TOTAL FLAGGED: {(len(werdios_ids))}",flush=True, end="\r")

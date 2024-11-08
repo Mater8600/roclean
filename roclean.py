@@ -70,11 +70,11 @@ def description_check(normal,werdios_ids,names_of_werdios,ids,display_names_list
             description = get_userinfo["description"]
             #is_banned_user = get_userinfo["isBanned"] ## soon
             if description == "description":
-                 
 
                  if verbose == True:
                     print("No description to check!")
                     return 
+                 
                  return
             if any(s in str(description) for s in list_of_common_description):
                 if verbose != None:
@@ -173,7 +173,7 @@ def main(id):
             threading.Thread(target=pager_scroller,args=(next_page,display_names_list,ids,response,)).start()
             time.sleep(.3)
         except:
-            print("done doing the requests")
+            print("\ndone doing the requests")
             break
     
 

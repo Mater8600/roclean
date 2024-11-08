@@ -4,11 +4,11 @@ from collections import Counter
 import re
 import threading
 import argparse 
+import codecs
 
 #### Made by "all" ####
 ### Heavily inspired by Ruben sim ###
 
-##### some varibles you can change ####
 print("""
 
 ██████╗░░█████╗░░█████╗░██╗░░░░░███████╗░█████╗░███╗░░██╗
@@ -21,6 +21,7 @@ print("""
 By mater8600
 """)
 
+##### some varibles you can change ####
 ### the list of "sus" words ###
 list_of_common_usernames = ["bbc", "czm", "czmdump", "bunny", "bun", "fill", "sus", "doll", "Bawls",
                                 "bxnny", "bull", "bxll", "luv", "bulls", "buIIs", "buII", "hearts", "Hearts",
@@ -39,7 +40,7 @@ werdios_groups = []
 werdios_groups_names = []
 werdios_ids = []
 reason_for_flag = []
-
+#is_banned = []## soon
 ### parser args and varibles ###
 
 parser = argparse.ArgumentParser()
@@ -65,20 +66,27 @@ def description_check(normal,werdios_ids,names_of_werdios,ids,display_names_list
     """"Checks the description of users that wasn't already flagged by the first scan."""
     
     try:
-            get_userinfo= requests.get(f"https://users.roblox.com/v1/users/{userid}",timeout=100).json()
+            get_userinfo= requests.get(f"https://users.roblox.com/v1/users/{userid}").json()
             description = get_userinfo["description"]
-            
+            #is_banned_user = get_userinfo["isBanned"] ## soon
+            if description == None:
+                 if verbose == True:
+                    print("No description to check!")
+                    return 
             if any(s in str(description) for s in list_of_common_description):
                 if verbose != None:
                     print(f"Flagged!: {normal}")
                 werdios_ids.append(userid)
                 names_of_werdios.append(normal)
                 reason_for_flag.append(description)
+                #is_banned.append(is_banned_user) ## soon
+
                 time.sleep(.2) ### Delay to prevent rate limiting
   
             else:
                 print(f"TOTAL FLAGGED: {(len(werdios_ids))}",flush=True, end="\r")
     except Exception as e:
+            
             print(f"You are being rate limited rerun the tool later to help with the problem, this is usually what happens when the tools is run in multiple times in a short time.\n{e}")
     
            
@@ -105,6 +113,7 @@ def pager_scroller(next_page,display_names_list,ids,response):
         display_names_list.append(entry['user']['displayName'])
     for entry in response['data']:
         ids.append(entry['user']['userId'])
+    
 
 def check_groups(i,werdios_groups,werdios_groups_names,werdios_ids):
     try:
@@ -217,13 +226,14 @@ def main(id):
             for i, c, r in zip(werdios_ids, range(1, len(werdios_ids)+1), reason_for_flag):
                 print(f"{c}. https://www.roblox.com/users/{i}/profile")
                 if output == True:
-                     with open(str(args.output), "a") as fp:
+                     with codecs.open(str(args.output), "a", "utf-8") as fp:
                           
                           try:
                             fp.write(f"\nReason for flag:\n{r}\nhttps://www.roblox.com/users/{i}/profile\n\n")
                             fp.close()
-                          except:
-                            fp.write(f"Reason for flag:\nCHARACTER ERROR PLEASE CHECK MANUALY\nhttps://www.roblox.com/users/{i}/profile\n\n")
+                          except Exception as e:
+                            print(f"looks like something was in their profile that caused an error\nError code:\n{e}")
+                            fp.write(f"Reason for flag:\nError occured, please check manually\nhttps://www.roblox.com/users/{i}/profile\n\n")
                             fp.close()
                         
             print("\ncommmon groups\n")

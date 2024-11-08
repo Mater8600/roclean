@@ -4,14 +4,22 @@ from collections import Counter
 import re
 import threading
 import argparse 
-import multiprocessing
-from multiprocessing import Pool
 
 #### Made by "all" ####
 ### Heavily inspired by Ruben sim ###
 
 ##### some varibles you can change ####
+print("""
 
+██████╗░░█████╗░░█████╗░██╗░░░░░███████╗░█████╗░███╗░░██╗
+██╔══██╗██╔══██╗██╔══██╗██║░░░░░██╔════╝██╔══██╗████╗░██║
+██████╔╝██║░░██║██║░░╚═╝██║░░░░░█████╗░░███████║██╔██╗██║
+██╔══██╗██║░░██║██║░░██╗██║░░░░░██╔══╝░░██╔══██║██║╚████║
+██║░░██║╚█████╔╝╚█████╔╝███████╗███████╗██║░░██║██║░╚███║
+╚═╝░░╚═╝░╚════╝░░╚════╝░╚══════╝╚══════╝╚═╝░░╚═╝╚═╝░░╚══╝
+      
+By mater8600
+""")
 
 ### the list of "sus" words ###
 list_of_common_usernames = ["bbc", "czm", "czmdump", "bunny", "bun", "fill", "sus", "doll", "Bawls",
@@ -25,56 +33,62 @@ list_of_common_description = [
     "trade", "rp", "💿", "studio", "dc", "roleplay" ,".-. .--.", ".-. .- .--. .", "... - ..- -.. .. ---"
 ]
 
+
+#### The lists for all of the flagged usernames ###
 werdios_groups = []
 werdios_groups_names = []
 werdios_ids = []
+reason_for_flag = []
+
+### parser args and varibles ###
 
 parser = argparse.ArgumentParser()
 
 parser.add_argument("-i", "--id", help="The to use to pwn the groups")
 parser.add_argument("-v", "--verbose", help="Be Verbose")
 parser.add_argument("-p", "--pages", help="How many pages of the group you want to pwn default 100",default=100)
-
+parser.add_argument("-o", "--output", help="If you want to ouput tot a file, so that you can upload it to the terminator X groups...", default=False)
 args = parser.parse_args()
 pages = int(args.pages)
 if args.verbose != None:
     verbose = True
 else:
-    verbose = False
-print("""
-█▀█ █▀█ █▀▀ █░░ █▀▀ ▄▀█ █▄░█
-█▀▄ █▄█ █▄▄ █▄▄ ██▄ █▀█ █░▀█
-""")
+    verbose = None
 
-print("""
-█▄▄ █▄█   ▄▀█ █░░ █░░
-█▄█ ░█░   █▀█ █▄▄ █▄▄
-""")
+if args.output != None:
+     output = True
+else:
+     output = False
+
+
 def description_check(normal,werdios_ids,names_of_werdios,ids,display_names_list,userid):
-    """"Checks the description of users that weren't flagged."""
-
-    print(f"TOTAL FLAGGED: {(len(werdios_ids))}\nTHIS WILL TAKE SOME TIME!\n\n\n")
+    """"Checks the description of users that wasn't already flagged by the first scan."""
+    
     try:
-            get_userinfo= requests.get(f"https://users.roblox.com/v1/users/{userid}").json()
+            get_userinfo= requests.get(f"https://users.roblox.com/v1/users/{userid}",timeout=100).json()
             description = get_userinfo["description"]
             
             if any(s in str(description) for s in list_of_common_description):
-                print(f"Flagged!: {normal}")
+                if verbose != None:
+                    print(f"Flagged!: {normal}")
                 werdios_ids.append(userid)
                 names_of_werdios.append(normal)
-                time.sleep(.2)
+                reason_for_flag.append(description)
+                time.sleep(.2) ### Delay to prevent rate limiting
   
             else:
-                print("")
+                print(f"TOTAL FLAGGED: {(len(werdios_ids))}",flush=True, end="\r")
     except Exception as e:
-            print(e)
+            print(f"You are being rate limited rerun the tool later to help with the problem, this is usually what happens when the tools is run in multiple times in a short time.\n{e}")
     
            
 
 def analyzeusers(displaynames,werdios_ids,names_of_werdios,ids,display_names_list):
+    """Analyzes the users by comparing the usernames with the worlist (This method is unreliable since it checks for 'normal' looking usernames)"""
     if any(s in str(displaynames) for s in list_of_common_usernames):
             werdios_ids.append(ids[display_names_list.index(displaynames)])
             names_of_werdios.append(displaynames)
+            reason_for_flag.append(f"Display name is potentially bad: {displaynames}")
             if args.verbose != None:
                 print("werdios:\n")
                 print(names_of_werdios)
@@ -82,7 +96,7 @@ def analyzeusers(displaynames,werdios_ids,names_of_werdios,ids,display_names_lis
                 print(werdios_ids)
                 print(f"Amount of flagged users {len(names_of_werdios)}\n")
 
-            print(f"Amount of flagged users {len(names_of_werdios)}\n")
+            print(f"Amount of flagged users {len(names_of_werdios)}",flush=True, end="\r")
     
 
    
@@ -108,11 +122,12 @@ def check_groups(i,werdios_groups,werdios_groups_names,werdios_ids):
                     print(werdios_groups)
                 else:
                     
-                    print("Total amount of users groups flagged "+str(len(werdios_groups_names)))
+                    print("Total amount of users groups flagged "+str(len(werdios_groups_names)),flush=True, end="\r")
                     
-    except:
-        print("Uh oh!")
-        exit()
+    except Exception as e:
+        print(f"Uh oh!\nError\n{e}")
+
+        
 
 
 def main(id):
@@ -130,20 +145,21 @@ def main(id):
     next_page = response['nextPageCursor']
     
     
-    print("We going to scroll through a few pages for the most people, and to avoid burner accounts...\nThis will take a while depending on the page value!!")
+    print("We going to scroll through a few pages for the most people, and to avoid burner accounts...\nThis will take a while depending on the page value!!\n")
     for i in range(pages):
         if args.verbose != None:
 
-            print(f"Scrolling through the pages. Next page Cursor: {next_page}")
+            print(f"Scrolling through the pages. Next page Cursor: {next_page}",flush=True, end="\r")
             
         else:
-            print(f"Scrolling through the pages! Current page: {i}")
+            print(f"Scrolling through the pages! Current page: {i+1}",flush=True, end="\r")
         try:
             get_req = requests.get(f"https://groups.roblox.com/v1/groups/{id}/users?limit=100&cursor={next_page}&sortOrder=Asc")
             response = get_req.json()
             next_page = response['nextPageCursor']
             
             threading.Thread(target=pager_scroller,args=(next_page,display_names_list,ids,response,)).start()
+            time.sleep(.3)
         except:
             print("done doing the requests")
             break
@@ -154,14 +170,15 @@ def main(id):
         print("\nList of names:\n\n")
         print(display_names_list)  
     else:
-        print(f"Amount of users in the group:{len(display_names_list)}")
+        print("\n")
+        print(f"Amount of users in the group:{len(display_names_list)}",flush=True, end="\r")
     ### Now to check the usernames for "sus" words ###
-    
+    print("\n")
     names_of_werdios = []
     for i in display_names_list:
         threading.Thread(target=analyzeusers,args=(i,werdios_ids,names_of_werdios,ids,display_names_list,)).start()
         ### Yeah, searching is fun!!! ## 
-
+    print("\n")
     for normal, userid in zip(display_names_list,ids):
         
         if normal in names_of_werdios:
@@ -173,8 +190,9 @@ def main(id):
        
         
     print(len(werdios_ids))
-        
-    print("done checking everything...") 
+    
+    if verbose ==True:
+        print("done checking everything...") 
         
         
        
@@ -194,10 +212,19 @@ def main(id):
         
             group_id_count = Counter(werdios_groups)             
             common = group_id_count.most_common(40)
-            print("\n\n\n\n\n\nconverting to user and groups links for ease of use!\n")
+            print("\nconverting to user and groups links for ease of use!\n")
             
-            for i, c in zip(werdios_ids, range(1, len(werdios_ids)+1)):
+            for i, c, r in zip(werdios_ids, range(1, len(werdios_ids)+1), reason_for_flag):
                 print(f"{c}. https://www.roblox.com/users/{i}/profile")
+                if output == True:
+                     with open(str(args.output), "a") as fp:
+                          
+                          try:
+                            fp.write(f"\nReason for flag:\n{r}\nhttps://www.roblox.com/users/{i}/profile\n\n")
+                            fp.close()
+                          except:
+                            fp.write(f"Reason for flag:\nCHARACTER ERROR PLEASE CHECK MANUALY\nhttps://www.roblox.com/users/{i}/profile\n\n")
+                            fp.close()
                         
             print("\ncommmon groups\n")
                     
@@ -213,7 +240,7 @@ if args.id != None:
       main(args.id)
       print("Done\nPlease make sure to check the flagged users ids")
       print("Bye bye see you soon!")
-else:
+if args.id == None:
      parser.print_help()
      print("Bye bye see you soon!")
  

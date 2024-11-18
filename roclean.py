@@ -31,7 +31,8 @@ list_of_common_usernames = ["bbc", "czm", "czmdump", "bunny", "bun", "fill", "su
                                   "clap3r", "Bull", "agepla", "D1DDY"]
 
 list_of_common_description = [
-    "trade", "rp", "💿", "studio", "dc", "roleplay" ,".-. .--.", ".-. .- .--. .", "... - ..- -.. .. ---"
+    "trade", "rp", "💿", "studio", "dc", "roleplay" ,".-. .--.", ".-. .- .--. .", "... - ..- -.. .. ---","♠️","📸","❄️","🐇","🐂",
+    "📀", "️🐰", "👻"
 ]
 
 
@@ -46,21 +47,39 @@ reason_for_flag = []
 parser = argparse.ArgumentParser()
 
 parser.add_argument("-i", "--id", help="The to use to pwn the groups")
-parser.add_argument("-v", "--verbose", help="Be Verbose")
+parser.add_argument("-v", "--verbose", help="Be Verbose",action="store_true")
 parser.add_argument("-p", "--pages", help="How many pages of the group you want to pwn default 100",default=100)
-parser.add_argument("-o", "--output", help="If you want to ouput tot a file, so that you can upload it to the terminator X groups...", default=False)
+parser.add_argument("-o", "--output", help="If you want to ouput to a file, so that you can upload it to the terminator X groups... ", default=None)
+parser.add_argument("-w", "--wordlist", help="Specifiy your own wordlist to use instead of the defaults...")
+parser.add_argument("-wd", "--wordlistdesc", help="description word list you can specifiy")
 args = parser.parse_args()
 pages = int(args.pages)
-if args.verbose != None:
-    verbose = True
-else:
-    verbose = None
 
-if args.output != None:
-     output = True
-else:
-     output = False
+if args.wordlist != None:
+    list_of_common_usernames = []
+    try:
+        with open(args.wordlist, "r") as fp:
+            lines = fp.readlines()
+            for line in lines:
+                 list_of_common_usernames.append(line)
+                
+    except Exception as exception:
+        print("Error while reading the file!\n")
+        print(exception)
+        exit()
 
+if args.wordlistdesc != None:
+     list_of_common_description = []
+     try:
+        with codecs.open(args.wordlistdesc, "r", "utf-8") as fp:
+            lines = fp.readlines()
+            for line in lines:
+                 list_of_common_description.append(line)
+                
+     except Exception as exception:
+        print("Error while reading the file!\n")
+        print(exception)
+        exit()
 
 def description_check(normal,werdios_ids,names_of_werdios,ids,display_names_list,userid):
     """"Checks the description of users that wasn't already flagged by the first scan."""
@@ -69,16 +88,16 @@ def description_check(normal,werdios_ids,names_of_werdios,ids,display_names_list
             get_userinfo= requests.get(f"https://users.roblox.com/v1/users/{userid}").json()
             description = get_userinfo["description"]
             #is_banned_user = get_userinfo["isBanned"] ## soon
-            if description == "description":
+            if description == "'description'":
 
-                 if verbose == True:
+                 if args.verbose == True:
                     print("No description to check!")
                     return 
                  
                  return
             if any(s in str(description) for s in list_of_common_description):
-                if verbose != None:
-                    print(f"Flagged!: {normal}")
+                if args.verbose == True:
+                    print(f"\nFlagged!: {normal}\n\n")
                 werdios_ids.append(userid)
                 names_of_werdios.append(normal)
                 reason_for_flag.append(description)
@@ -87,11 +106,11 @@ def description_check(normal,werdios_ids,names_of_werdios,ids,display_names_list
                 time.sleep(.3) ### Delay to prevent rate limiting
   
             else:
-                print(f"TOTAL FLAGGED: {(len(werdios_ids))}",flush=True, end="\r")
+                print(f"TOTAL FLAGGED:{len(werdios_ids)} Percent:{round(len(werdios_ids)/len(display_names_list)*100)}%",flush=True, end="\r")
     except Exception as e:
             
-            print(f"You are being rate limited rerun the tool later to help with the problem, this is usually what happens when the tools is run in multiple times in a short time.\n{e}")
-    
+            print(f"You are probably being rate limited rerun the tool later to help with the problem, this is usually what happens when the tools is run in multiple times in a short time.\n{e}\nsleeping for a min")
+            time.sleep(60)
            
 
 def analyzeusers(displaynames,werdios_ids,names_of_werdios,ids,display_names_list):
@@ -100,14 +119,12 @@ def analyzeusers(displaynames,werdios_ids,names_of_werdios,ids,display_names_lis
             werdios_ids.append(ids[display_names_list.index(displaynames)])
             names_of_werdios.append(displaynames)
             reason_for_flag.append(f"Display name is potentially bad: {displaynames}")
-            if args.verbose != None:
-                print("werdios:\n")
-                print(names_of_werdios)
-                print("full list (ids):\n")
-                print(werdios_ids)
+            if args.verbose ==True:
+                print(f"flagged!:  {displaynames}")
+                print(f"The total amount of possible flagged users!: {len(names_of_werdios)}")
                 print(f"Amount of flagged users {len(names_of_werdios)}\n")
-
-            print(f"Amount of flagged users {len(names_of_werdios)}",flush=True, end="\r")
+            else:
+                print(f"Amount of flagged users by username {len(names_of_werdios)}",flush=True, end="\r")
     
 
    
@@ -127,11 +144,11 @@ def check_groups(i,werdios_groups,werdios_groups_names,werdios_ids):
                 werdios_groups_names.append(entry['group']['name'])
                 
                 
-                if args.verbose != None:
-                    print("werdios groups:\n")
+                if args.verbose == True:
+                    print(f"Amount of groups that flagged users are in: {len(werdios_groups)} these COULD be innocent!\n")
                     print(werdios_groups_names)
-                    print("werdios group ids")
-                    print(werdios_groups)
+                    
+                    
                 else:
                     
                     print("Total amount of users groups flagged "+str(len(werdios_groups_names)),flush=True, end="\r")
@@ -159,7 +176,7 @@ def main(id):
     
     print("We going to scroll through a few pages for the most people, and to avoid burner accounts...\nThis will take a while depending on the page value!!\n")
     for i in range(pages):
-        if args.verbose != None:
+        if args.verbose == True:
 
             print(f"Scrolling through the pages. Next page Cursor: {next_page}",flush=True, end="\r")
             
@@ -173,12 +190,13 @@ def main(id):
             threading.Thread(target=pager_scroller,args=(next_page,display_names_list,ids,response,)).start()
             time.sleep(.3)
         except:
-            print("\ndone doing the requests")
+            print("\n\n")
+            print("done doing the requests")
             break
     
 
        
-    if  args.verbose != None:
+    if  args.verbose == True:
         print("\nList of names:\n\n")
         print(display_names_list)  
     else:
@@ -194,7 +212,7 @@ def main(id):
     for normal, userid in zip(display_names_list,ids):
         
         if normal in names_of_werdios:
-            if verbose != None:
+            if args.verbose == True:
                 print(f"Already flagged: {normal}")
             continue
         
@@ -203,12 +221,12 @@ def main(id):
         
     print(len(werdios_ids))
     
-    if verbose ==True:
+    if args.verbose ==True:
         print("done checking everything...") 
         
         
        
-    print("this will take some time!")
+    
  
     for i in werdios_ids:
            
@@ -228,7 +246,7 @@ def main(id):
             
             for i, c, r in zip(werdios_ids, range(1, len(werdios_ids)+1), reason_for_flag):
                 print(f"{c}. https://www.roblox.com/users/{i}/profile")
-                if output == True:
+                if args.output != None:
                      with codecs.open(str(args.output), "a", "utf-8") as fp:
                           
                           try:
@@ -244,7 +262,9 @@ def main(id):
             for i, count in common:
                 cleaned = re.sub(r"\(\)", '', str(i))
                 print(f"https://www.roblox.com/groups/{cleaned}" + " How many are in this group: " + str(count) )
-          
+
+
+            print(f"Total amount of users in scan: {len(display_names_list)}\nPercentage flagged: {round(len(names_of_werdios)/len(display_names_list)*100)}%")
             break
                     
 
@@ -253,6 +273,7 @@ if args.id != None:
       main(args.id)
       print("Done\nPlease make sure to check the flagged users ids")
       print("Bye bye see you soon!")
+      
 if args.id == None:
      parser.print_help()
      print("Bye bye see you soon!")

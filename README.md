@@ -45,6 +45,9 @@ python roclean.py --id GROUP_ID [options]
 --id GROUP_ID        Roblox group ID to analyze (required)
 --verbose BOOL       Enable detailed output (default: False)
 --pages INT         Number of pages to scan (default: 100)
+--output STR        Outputs the results to a file
+--wordlist STR      Use a custom wordlist instead of the default
+--wordlistdesc STR  Use a cutom wordlist for descriptions instead of the default
 ```
 
 ### Example Commands

@@ -1,283 +1,317 @@
 import requests 
 import time
 from collections import Counter
-import re
-import threading
-import argparse 
+import argparse
 import codecs
+import threading
+import re
+import random
 
-#### Made by "all" ####
-### Heavily inspired by Ruben sim ###
 
+### THIS VERSION OF ROCLEAN IS A REWRITE OF THE ENTIRE SCRIPT. ###
+### THIS VERSION IS MORE EFFICIENT AND HAS A LOT MORE FEATURES. ###
 print("""
-
-██████╗░░█████╗░░█████╗░██╗░░░░░███████╗░█████╗░███╗░░██╗
-██╔══██╗██╔══██╗██╔══██╗██║░░░░░██╔════╝██╔══██╗████╗░██║
-██████╔╝██║░░██║██║░░╚═╝██║░░░░░█████╗░░███████║██╔██╗██║
-██╔══██╗██║░░██║██║░░██╗██║░░░░░██╔══╝░░██╔══██║██║╚████║
-██║░░██║╚█████╔╝╚█████╔╝███████╗███████╗██║░░██║██║░╚███║
-╚═╝░░╚═╝░╚════╝░░╚════╝░╚══════╝╚══════╝╚═╝░░╚═╝╚═╝░░╚══╝
+█▀█ █▀█ █▀▀ █░░ █▀▀ ▄▀█ █▄░█
+█▀▄ █▄█ █▄▄ █▄▄ ██▄ █▀█ █░▀█
       
-By mater8600
+ᵇʸ ᵐᵃᵗᵉʳ⁸⁶⁰⁰
 """)
+### argument parser stuff ###
+parser = argparse.ArgumentParser(description="A tool that allows you to find suspious accounts in Roblox groups.")
+parser.add_argument("-i", "--id", help="The id of the group to target")
+parser.add_argument("-r", "--recursion", help="Continues the scan on the next groups. Set page amount to 0", action="store_true")
+parser.add_argument("-v", "--verbose", help="Be Verbose",action="store_true")
+parser.add_argument("-p", "--pages", help="The amount of pages to scan default 10",default=10)
+parser.add_argument("-o", "--output", help="Output all found users to a file")
+parser.add_argument("--animations", help="Adds useless and time consuming animations to the text for fun.", action="store_true")
+args = parser.parse_args()
 
-##### some varibles you can change ####
-### the list of "sus" words ###
-list_of_common_usernames = ["bbc", "czm", "czmdump", "bunny", "bun", "fill", "sus", "doll", "Bawls",
+### Lists for processing ###
+displaynames_involved_in_group = []
+descriptions_involved_in_group =[]
+userids_involved_in_group = []
+
+
+
+### Flagged accounts ###
+
+flagged_accounts_id = []
+flagged_friends_id = []
+flagged_friends_displayname = []
+friends_reason = []
+friends_is_banned = []
+flagged_friends_description = []
+flagged_accounts_displayname = []
+flagged_accounts_description = []
+reason_for_flag = []
+flagged_accounts_groups= []
+flagged_accounts_groups_name = []
+is_banned = []
+
+### Bad user/display names lists ###
+
+### These are actually from a ton of flagged accounts that ha werid descriptions ###
+### Unfortunately these are highly common in the Roblox community. ###
+description_check_list = [ "trade", "rp", "💿", "studio", "dc", "roleplay" ,".-. .--.", ".-. .- .--. .", "... - ..- -.. .. ---","♠️","📸","❄️","🐇","🐂",
+    "📀", "️🐰", "👻", " .- -.. -.. / -- . / ..-. --- .-. / -- --- .-. . / .. -. ..-. --- -.-.--"]
+
+
+### These are actually from a ton of different groups that I have seen in the past. ###
+### These are the most common ones that I have seen. ###
+### If you have any suggestions for more please let me know! ###
+usernames_displaynames_list = ["bbc", "czm", "czmdump", "bunny", "bun", "fill", "sus", "doll", "Bawls",
                                 "bxnny", "bull", "bxll", "luv", "bulls", "buIIs", "buII", "hearts", "Hearts",
                                 "12yr", "cxm", "ass", "a33", "fap", "reps", "blow", "m1kies","lov","snow","toy",
                                   "a$$", "loli","t0y","femboy", "Femboy", "cun", "4dd", "4fun", "funtime","hardr","Ag3","mommmies",
                                   "mommies","girlsFonly", "trade", "trding", "studio", "femmie", "added", "addme", "11yrs",
-                                  "clap3r", "Bull", "agepla", "D1DDY"]
+                                  "clap3r", "Bull", "agepla", "D1DDY", " gettinREALLLLsilly", "shotah", "Shotah", "spade", "goon", "P0unding",
+                                  "checkbio", "CheckBio", "Checkbio", "checkBio", "fmboy", "fre4k", "Littlekid"]
 
-list_of_common_description = [
-    "trade", "rp", "💿", "studio", "dc", "roleplay" ,".-. .--.", ".-. .- .--. .", "... - ..- -.. .. ---","♠️","📸","❄️","🐇","🐂",
-    "📀", "️🐰", "👻"
-]
-
-
-#### The lists for all of the flagged usernames ###
-werdios_groups = []
-werdios_groups_names = []
-werdios_ids = []
-reason_for_flag = []
-#is_banned = []## soon
-### parser args and varibles ###
-
-parser = argparse.ArgumentParser()
-
-parser.add_argument("-i", "--id", help="The to use to pwn the groups")
-parser.add_argument("-v", "--verbose", help="Be Verbose",action="store_true")
-parser.add_argument("-p", "--pages", help="How many pages of the group you want to pwn default 100",default=100)
-parser.add_argument("-o", "--output", help="If you want to ouput to a file, so that you can upload it to the terminator X groups... ", default=None)
-parser.add_argument("-w", "--wordlist", help="Specifiy your own wordlist to use instead of the defaults...")
-parser.add_argument("-wd", "--wordlistdesc", help="description word list you can specifiy")
-args = parser.parse_args()
-pages = int(args.pages)
-
-if args.wordlist != None:
-    list_of_common_usernames = []
-    try:
-        with open(args.wordlist, "r") as fp:
-            lines = fp.readlines()
-            for line in lines:
-                 list_of_common_usernames.append(line)
-                
-    except Exception as exception:
-        print("Error while reading the file!\n")
-        print(exception)
-        exit()
-
-if args.wordlistdesc != None:
-     list_of_common_description = []
-     try:
-        with codecs.open(args.wordlistdesc, "r", "utf-8") as fp:
-            lines = fp.readlines()
-            for line in lines:
-                 list_of_common_description.append(line)
-                
-     except Exception as exception:
-        print("Error while reading the file!\n")
-        print(exception)
-        exit()
-
-def description_check(normal,werdios_ids,names_of_werdios,ids,display_names_list,userid):
-    """"Checks the description of users that wasn't already flagged by the first scan."""
-    
-    try:
-            get_userinfo= requests.get(f"https://users.roblox.com/v1/users/{userid}").json()
-            description = get_userinfo["description"]
-            #is_banned_user = get_userinfo["isBanned"] ## soon
-            if description == "'description'":
-
-                 if args.verbose == True:
-                    print("No description to check!")
-                    return 
-                 
-                 return
-            if any(s in str(description) for s in list_of_common_description):
-                if args.verbose == True:
-                    print(f"\nFlagged!: {normal}\n\n")
-                werdios_ids.append(userid)
-                names_of_werdios.append(normal)
-                reason_for_flag.append(description)
-                #is_banned.append(is_banned_user) ## soon
-
-                time.sleep(.3) ### Delay to prevent rate limiting
-  
-            else:
-                print(f"TOTAL FLAGGED:{len(werdios_ids)} Percent:{round(len(werdios_ids)/len(display_names_list)*100)}%",flush=True, end="\r")
-    except Exception as e:
+def pager_scroller(userids_involved_in_group,response):
+    """Processes the data collected by the group scrapper, and adds all of the users to the user id section"""
+    for entry in response['data']:
+        userids_involved_in_group.append(entry['user']['userId'])
+ 
+def page_getter(pages,groupid):
+    """Like Roclean's old scanner just no display names are gather because the names are going to get gathered later..."""
+    print(f"Scrolling through the many pages of the group... TODO: {pages}", flush=True,end="\r")
+    print("\n")
+    get_req = requests.get(f"https://groups.roblox.com/v1/groups/{groupid}/users?limit=100&sortOrder=Asc")
+    response = get_req.json()
+    for entry in response['data']:
+                userids_involved_in_group.append(entry['user']['userId'])  
+    next_page = response['nextPageCursor']
+    for i in range(pages):
+        if args.verbose == True:
+            print(f"Scrolling through the pages. Next page Cursor: {next_page}",flush=True, end="\r")
+        else:
+            print(f"Scrolling through the pages! Current page: {i+1}",flush=True, end="\r")
+        try:
+            get_req = requests.get(f"https://groups.roblox.com/v1/groups/{groupid}/users?limit=100&cursor={next_page}&sortOrder=Asc")
+            response = get_req.json()
+            next_page = response['nextPageCursor']
             
-            print(f"You are probably being rate limited rerun the tool later to help with the problem, this is usually what happens when the tools is run in multiple times in a short time.\n{e}\nsleeping for a min")
-            time.sleep(60)
-           
-
-def analyzeusers(displaynames,werdios_ids,names_of_werdios,ids,display_names_list):
-    """Analyzes the users by comparing the usernames with the worlist (This method is unreliable since it checks for 'normal' looking usernames)"""
-    if any(s in str(displaynames) for s in list_of_common_usernames):
-            werdios_ids.append(ids[display_names_list.index(displaynames)])
-            names_of_werdios.append(displaynames)
-            reason_for_flag.append(f"Display name is potentially bad: {displaynames}")
-            if args.verbose ==True:
-                print(f"flagged!:  {displaynames}")
-                print(f"The total amount of possible flagged users!: {len(names_of_werdios)}")
-                print(f"Amount of flagged users {len(names_of_werdios)}\n")
-            else:
-                print(f"Amount of flagged users by username {len(names_of_werdios)}",flush=True, end="\r")
-    
-
-   
-def pager_scroller(next_page,display_names_list,ids,response):
-    for entry in response['data']:
-        display_names_list.append(entry['user']['displayName'])
-    for entry in response['data']:
-        ids.append(entry['user']['userId'])
-    
-
-def check_groups(i,werdios_groups,werdios_groups_names,werdios_ids):
+            threading.Thread(target=pager_scroller,args=(userids_involved_in_group,response,)).start()
+            time.sleep(.3)
+        except:
+            print("\n")
+            break
+def animate_text(flagged_accounts_id,cycles,stop_event):
+    for _ in range(cycles):  
+        if stop_event.is_set():
+             return 
+        frames = ["Current flagged", "cUrrent flagged", "cuRrent flagged", "curRent flagged", "currEnt flagged", "curreNt flagged", "currenT flagged", "current Flagged"
+                  , "current fLagged", "current flAgged", "current flaGged", "current flagGed", "current flaggEd", "current flaggeD"]
+        for i in range(len(frames)):
+            print(f"{frames[i]}: {len(flagged_accounts_id)}",flush=True,end="\r")
+            
+            
+            time.sleep(0.2)
+            
+            
+def get_all_users(userid):
+    """Scan all of the group members manually flagging each one..."""
+    get_userinfo= requests.get(f"https://users.roblox.com/v1/users/{userid}").json()
     try:
-        response_groups = requests.get(f"https://groups.roblox.com/v1/users/{i}/groups/roles?includeLocked=true")
+        description = get_userinfo["description"]
+        display_name = get_userinfo['displayName']
+        banned = get_userinfo["isBanned"]
+            
+        if args.animations == False:
+             print(f"Current flagged: {len(flagged_accounts_id)}", flush=True, end="\r")
+        
+        
+        if any(s in str(display_name) for s in usernames_displaynames_list):
+            flagged_accounts_id.append(userid)
+            flagged_accounts_displayname.append(display_name)
+            flagged_accounts_description.append(description)
+            is_banned.append(banned)
+            reason_for_flag.append(f"This account has a suspious username")
+            rate_limited = False
+            return rate_limited
+        if any(s in str(description) for s in description_check_list):
+            flagged_accounts_id.append(userid)
+            flagged_accounts_displayname.append(display_name)
+            flagged_accounts_description.append(description)
+            is_banned.append(banned)
+            reason_for_flag.append(f"This account has a suspious description")
+            rate_limited = False
+            return rate_limited
+        else:
+            rate_limited = False
+            return rate_limited
+    
+    except:
+        
+        time.sleep(45)
+        rate_limited = True
+        return rate_limited
+def check_friends(userid):
+     """Adds the users friends to the flagged list"""
+     try:
+        response = requests.get(f"https://friends.roblox.com/v1/users/{userid}/friends")
+        response = response.json()
+        for entry in response['data']:
+            flagged_friends_id.append(entry['id'])
+            flagged_friends_displayname.append(entry['displayName'])
+            get_description = requests.get(f"https://users.roblox.com/v1/users/{entry['id']}").json()
+            flagged_friends_description.append(get_description['description'])
+            friends_reason.append(f"This account is friends with a flagged user {userid}")
+            friends_is_banned.append(get_description['isBanned'])
+            print("Total amount of users friends added:"+str(len(flagged_friends_displayname)),flush=True, end="\r")
+            return False
+     except Exception as e:
+        if args.verbose == True:
+             
+            print(f"You are being rate limited!\n{e} Slowing down the scan for 45 seconds")
+            time.sleep(30)
+            print("Retrying")
+            return True
+        else:
+            time.sleep(30)
+        
+            return True
+     
+     
+def check_groups(userid):
+    """Scrolls through all of the flagged users groups."""
+    try:
+        response_groups = requests.get(f"https://groups.roblox.com/v1/users/{userid}/groups/roles?includeLocked=true")
         response_groups = response_groups.json()
         for entry in response_groups['data']:
-                werdios_groups.append(entry['group']['id'])
-                werdios_groups_names.append(entry['group']['name'])
+                flagged_accounts_groups.append(entry['group']['id'])
+                flagged_accounts_groups_name.append(entry['group']['name'])
                 
                 
                 if args.verbose == True:
-                    print(f"Amount of groups that flagged users are in: {len(werdios_groups)} these COULD be innocent!\n")
-                    print(werdios_groups_names)
+                    print(f"Amount of groups that flagged users are in: {len(flagged_accounts_groups)} these COULD be innocent!\n")
+                    print(flagged_accounts_groups_name)
+                    return False
+
                     
                     
                 else:
                     
-                    print("Total amount of users groups flagged "+str(len(werdios_groups_names)),flush=True, end="\r")
+                    print("Total amount of users groups flagged "+str(len(flagged_accounts_groups_name)),flush=True, end="\r")
+                    return False
                     
     except Exception as e:
         print(f"Uh oh!\nError\n{e}")
-
-        
-
-
-def main(id):
-    get_req = requests.get(f"https://groups.roblox.com/v1/groups/{id}/users?limit=100&sortOrder=Asc")
-      
-    response = get_req.json()
-    display_names_list = []
-    ids = []
+        return True
     
-    for entry in response['data']:
-                ids.append(entry['user']['userId'])
-    for entry in response['data']:
-        display_names_list.append(entry['user']['displayName'])
-        
-    next_page = response['nextPageCursor']
-    
-    
-    print("We going to scroll through a few pages for the most people, and to avoid burner accounts...\nThis will take a while depending on the page value!!\n")
-    for i in range(pages):
-        if args.verbose == True:
-
-            print(f"Scrolling through the pages. Next page Cursor: {next_page}",flush=True, end="\r")
-            
-        else:
-            print(f"Scrolling through the pages! Current page: {i+1}",flush=True, end="\r")
-        try:
-            get_req = requests.get(f"https://groups.roblox.com/v1/groups/{id}/users?limit=100&cursor={next_page}&sortOrder=Asc")
-            response = get_req.json()
-            next_page = response['nextPageCursor']
-            
-            threading.Thread(target=pager_scroller,args=(next_page,display_names_list,ids,response,)).start()
-            time.sleep(.3)
-        except:
-            print("\n\n")
-            print("done doing the requests")
-            break
-    
-
-       
-    if  args.verbose == True:
-        print("\nList of names:\n\n")
-        print(display_names_list)  
-    else:
-        print("\n")
-        print(f"Amount of users in the group:{len(display_names_list)}",flush=True, end="\r")
-    ### Now to check the usernames for "sus" words ###
-    print("\n")
-    names_of_werdios = []
-    for i in display_names_list:
-        threading.Thread(target=analyzeusers,args=(i,werdios_ids,names_of_werdios,ids,display_names_list,)).start()
-        ### Yeah, searching is fun!!! ## 
-    print("\n")
-    for normal, userid in zip(display_names_list,ids):
-        
-        if normal in names_of_werdios:
-            if args.verbose == True:
-                print(f"Already flagged: {normal}")
-            continue
-        
-        description_check(normal,werdios_ids,names_of_werdios,ids,display_names_list,userid)
-       
-        
-    print(len(werdios_ids))
-    
-    if args.verbose ==True:
-        print("done checking everything...") 
-        
-        
-       
-    
- 
-    for i in werdios_ids:
-           
-            if len(werdios_groups) >= 100000:
-                break
-            else:
-                check_groups(i,werdios_groups,werdios_groups_names,werdios_ids)
-
+def main(groupid):
+    """Main function"""
+    print(f"Running a scan against: {groupid}. Report any finds to proper authorites.\n\n")
+    page_getter(pages=int(args.pages), groupid=groupid)
+    print("")
+    stop_event = threading.Event()
+    cycles = len(userids_involved_in_group)
+    animation_thread = threading.Thread(target=animate_text, args=(flagged_accounts_id,cycles, stop_event,))
+    animation_thread.daemon = True
+    if args.animations == True:
+        animation_thread.start()
+    for users in userids_involved_in_group:
+        get_all_users(users)
+    print("") 
+    stop_event.set()
      
-    while True:
-        active_threads = threading.active_count()
-        if active_threads <= 1:
-        
-            group_id_count = Counter(werdios_groups)             
-            common = group_id_count.most_common(40)
-            print("\nconverting to user and groups links for ease of use!\n")
-            
-            for i, c, r in zip(werdios_ids, range(1, len(werdios_ids)+1), reason_for_flag):
-                print(f"{c}. https://www.roblox.com/users/{i}/profile")
+    for users in flagged_accounts_id:
+          rated = check_groups(users)
+          if rated == True:
+               rated = check_groups(users)
+               if rated == True:
+                    rated = check_groups(users)
+          else:
+               continue
+    ### check the friends of the flagged users ###
+    print("\nChecking the friends of the flagged users\n")
+    for users in flagged_accounts_id:
+
+        ratlimited_friends = check_friends(users)
+        if ratlimited_friends == True:
+            ratlimited_friends = check_friends(users)
+            if ratlimited_friends == True:
+                ratlimited_friends = check_friends(users)
+        else:
+            continue
+
+               
+         
+
+    group_id_count = Counter(flagged_accounts_groups)             
+    common = group_id_count.most_common(40)
+    common_group_names_count = Counter(flagged_accounts_groups_name)
+    common_group_names = common_group_names_count.most_common(40)
+    print("\nDone flagged users:\n")
+    
+    for i, c, r, username, description, banned in zip(flagged_accounts_id, range(1, len(flagged_accounts_id)+1), reason_for_flag, flagged_accounts_displayname, flagged_accounts_description,is_banned):
+            print(f"{c}. https://www.roblox.com/users/{i}/profile")
+            if args.output != None:
+                with codecs.open(args.output, "a", "utf-8") as fp:
+                    fp.write(f"\nUsername:{username}\nDescription:\n{description}\nis_banned:{banned}\nReason:{r}\nurl: https://www.roblox.com/users/{i}/profile\n")
+                    fp.close()
+    print("\nflagged friends:\n")
+    for i, c, r, username, description, banned in zip(flagged_friends_id, range(1, len(flagged_friends_id)+1), friends_reason, flagged_friends_displayname, flagged_friends_description,friends_is_banned):
+            print(f"{c}. https://www.roblox.com/users/{i}/profile")
+            if args.output != None:
+                with codecs.open(args.output, "a", "utf-8") as fp:
+                    fp.write(f"\nUsername:{username}\nDescription:\n{description}\nis_banned:{banned}\nReason:{r}\nurl: https://www.roblox.com/users/{i}/profile\n")
+                    fp.close()
+    print("All of the groups the flagged users are in\n")
+    for (i ,count), (name, number) in zip(common, common_group_names):
+                cleaned_group = re.sub(r"\(\)", '', str(i))
+                print(f"Group name: {name} https://www.roblox.com/groups/{cleaned_group}" + " How many are in this group: " + str(count) )
                 if args.output != None:
-                     with codecs.open(str(args.output), "a", "utf-8") as fp:
-                          
-                          try:
-                            fp.write(f"\nReason for flag:\n{r}\nhttps://www.roblox.com/users/{i}/profile\n\n")
-                            fp.close()
-                          except Exception as e:
-                            print(f"looks like something was in their profile that caused an error\nError code:\n{e}")
-                            fp.write(f"Reason for flag:\nError occured, please check manually\nhttps://www.roblox.com/users/{i}/profile\n\n")
-                            fp.close()
-                        
-            print("\ncommmon groups\n")
-                    
-            for i, count in common:
-                cleaned = re.sub(r"\(\)", '', str(i))
-                print(f"https://www.roblox.com/groups/{cleaned}" + " How many are in this group: " + str(count) )
+                    with codecs.open(args.output, "a", "utf-8") as fp:
+                        fp.write(f"\nGroup name: {name} https://www.roblox.com/groups/{cleaned_group}" + " How many are in this group: " + str(count) + "\n" )
 
 
-            print(f"Total amount of users in scan: {len(display_names_list)}\nPercentage flagged: {round(len(names_of_werdios)/len(display_names_list)*100)}%")
-            break
-                    
 
+    print(f"\nTotal amount of users in scan: {len(userids_involved_in_group)}\nPercentage flagged: {round(len(flagged_accounts_id)/len(userids_involved_in_group)*100)}%")
+    if args.recursion == True:
+        return common
+    else:
+        exit()
     
-if args.id != None:
-      main(args.id)
-      print("Done\nPlease make sure to check the flagged users ids")
-      print("Bye bye see you soon!")
-      
-if args.id == None:
+
+
+if args.id != None and args.pages != None and args.recursion == False:
+    main(groupid=args.id)
+
+
+if args.id != None and args.recursion == True and args.pages != None:
+    print(f"RECUSION MODE ENABLED!!!!\n\nThis will scan the next group in the list indefinitly!\n\n")
+    common = main(groupid=args.id)
+    done_groups = []
+    print(common)
+    while True:
+         ### Lists for processing ###
+        displaynames_involved_in_group = []
+        descriptions_involved_in_group =[]
+        userids_involved_in_group = []
+
+
+### Flagged accounts ###
+
+        flagged_accounts_id = []
+        flagged_accounts_displayname = []
+        flagged_accounts_description = []
+        reason_for_flag = []
+        flagged_accounts_groups= []
+        flagged_accounts_groups_name = []
+        is_banned = []
+
+        next_group = common[0][1]
+        if next_group in done_groups:
+            print("this group has already been scanned")
+            next_group = random.choice(common)[1]
+                
+
+            print(f"Next group to scan: {next_group}")
+            next_group = main(groupid=next_group)
+        
+     
+         
+else:
      parser.print_help()
-     print("Bye bye see you soon!")
- 
-    
- 
-    
+     exit()

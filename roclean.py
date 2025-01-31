@@ -6,7 +6,7 @@ import codecs
 import threading
 import re
 import random
-
+import keyboard
 
 ### THIS VERSION OF ROCLEAN IS A REWRITE OF THE ENTIRE SCRIPT. ###
 ### THIS VERSION IS MORE EFFICIENT AND HAS A LOT MORE FEATURES. ###
@@ -19,7 +19,7 @@ print("""
 ### argument parser stuff ###
 parser = argparse.ArgumentParser(description="A tool that allows you to find suspious accounts in Roblox groups.")
 parser.add_argument("-i", "--id", help="The id of the group to target")
-parser.add_argument("-r", "--recursion", help="Continues the scan on the next groups. Set page amount to 0", action="store_true")
+parser.add_argument("-r", "--recursion", help="Continues the scan on the next groups. Set page amount to lower values to avoid rate limiting", action="store_true")
 parser.add_argument("-v", "--verbose", help="Be Verbose",action="store_true")
 parser.add_argument("-p", "--pages", help="The amount of pages to scan default 10",default=10)
 parser.add_argument("-o", "--output", help="Output all found users to a file")
@@ -181,14 +181,17 @@ def check_friends(userid):
         response = requests.get(f"https://friends.roblox.com/v1/users/{userid}/friends")
         response = response.json()
         for entry in response['data']:
-            flagged_friends_id.append(entry['id'])
-            flagged_friends_displayname.append(entry['displayName'])
-            get_description = requests.get(f"https://users.roblox.com/v1/users/{entry['id']}").json()
-            flagged_friends_description.append(get_description['description'])
-            friends_reason.append(f"This account is friends with a flagged user {userid}")
-            friends_is_banned.append(get_description['isBanned'])
-            print("Total amount of users friends added:"+str(len(flagged_friends_displayname)),flush=True, end="\r")
-            return False
+            if entry['id'] in flagged_friends_id:
+                pass
+            else:
+                flagged_friends_id.append(entry['id'])
+                flagged_friends_displayname.append(entry['displayName'])
+                get_description = requests.get(f"https://users.roblox.com/v1/users/{entry['id']}").json()
+                flagged_friends_description.append(get_description['description'])
+                friends_reason.append(f"This account is friends with a flagged user {userid}")
+                friends_is_banned.append(get_description['isBanned'])
+                print("Total amount of users friends added:"+str(len(flagged_friends_displayname)),flush=True, end="\r")
+                return False
      except Exception as e:
         if args.verbose == True:
              
@@ -253,7 +256,7 @@ def main(groupid):
           else:
                continue
     ### check the friends of the flagged users ###
-    print("\nChecking the friends of the flagged users\n")
+    print("Checking the friends of the flagged users\n")
     for users in flagged_accounts_id:
 
         ratlimited_friends = check_friends(users)
@@ -298,6 +301,7 @@ def main(groupid):
 
     print(f"\nTotal amount of users in scan: {len(userids_involved_in_group)}\nPercentage flagged: {round(len(flagged_accounts_id)/len(userids_involved_in_group)*100)}%")
     if args.recursion == True:
+        
         return common
     else:
         exit()
@@ -309,37 +313,86 @@ if args.id != None and args.pages != None and args.recursion == False:
 
 
 if args.id != None and args.recursion == True and args.pages != None:
-    print(f"RECUSION MODE ENABLED!!!!\n\nThis will scan the next group in the list indefinitly!\n\n")
+    print(f"RECURSION MODE ENABLED!!!!\n\nThis will scan the next group in the list indefinitly!\n\nUntil you hit the q key on your keyboard!\n")
     common = main(groupid=args.id)
     done_groups = []
-    print(common)
-    while True:
-         ### Lists for processing ###
+    done_groups.append(args.id)
+    stop = False
+    while stop == False:
+        print("Stop the scan by pressing the q key on your keyboard!")
+        for i in range(0,50):
+
+            if keyboard.is_pressed("q"):
+                
+                stop = True
+                break
+            time.sleep(.2)
+
+        
+        if stop == True:
+            break
+
         displaynames_involved_in_group = []
         descriptions_involved_in_group =[]
         userids_involved_in_group = []
 
 
+
 ### Flagged accounts ###
 
         flagged_accounts_id = []
+        flagged_friends_id = []
+        flagged_friends_displayname = []
+        friends_reason = []
+        friends_is_banned = []
+        flagged_friends_description = []
         flagged_accounts_displayname = []
         flagged_accounts_description = []
         reason_for_flag = []
         flagged_accounts_groups= []
         flagged_accounts_groups_name = []
         is_banned = []
+         ### Lists for processing ###
 
-        next_group = common[0][1]
-        if next_group in done_groups:
-            print("this group has already been scanned")
-            next_group = random.choice(common)[1]
+        next_group = random.choice(common)[0]
+        print(common)
+        #print(f"Next group to scan: {next_group}")
+        for done  in done_groups:
+            print("Stop the scan by pressing the q key on your keyboard!")
+            for i in range(0,50):
+
+                if keyboard.is_pressed("q"):
+                
+                    stop = True
+                    break
+                time.sleep(.2)
+
+        
+            if stop == True:
+                break
+            if next_group == done:
                 
 
-            print(f"Next group to scan: {next_group}")
-            next_group = main(groupid=next_group)
+                print("this group has already been scanned")
+                next_group = random.choice(common)[0]
+                print(f"Next group to scan: {next_group}")
+                next_group_r = main(groupid=next_group)
+                done_groups.append(next_group)
+                
+                common.clear()
+                common = next_group_r
+            else:
+                print("Good to go!")
+                next_group_r = main(groupid=next_group)
+                common.clear()
+                common = next_group_r
+                done_groups.append(next_group)
         
-     
+
+    print("Exiting...")
+    exit()
+           
+
          
 else:
      parser.print_help()

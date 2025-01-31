@@ -24,7 +24,10 @@ parser.add_argument("-v", "--verbose", help="Be Verbose",action="store_true")
 parser.add_argument("-p", "--pages", help="The amount of pages to scan default 10",default=10)
 parser.add_argument("-o", "--output", help="Output all found users to a file")
 parser.add_argument("--animations", help="Adds useless and time consuming animations to the text for fun.", action="store_true")
+parser.add_argument("-w", "--wordlist", help="Specifiy your own wordlist to use instead of the defaults...")
+parser.add_argument("-wd", "--wordlistdesc", help="description word list you can specifiy")
 args = parser.parse_args()
+
 
 ### Lists for processing ###
 displaynames_involved_in_group = []
@@ -66,7 +69,33 @@ usernames_displaynames_list = ["bbc", "czm", "czmdump", "bunny", "bun", "fill", 
                                   "mommies","girlsFonly", "trade", "trding", "studio", "femmie", "added", "addme", "11yrs",
                                   "clap3r", "Bull", "agepla", "D1DDY", " gettinREALLLLsilly", "shotah", "Shotah", "spade", "goon", "P0unding",
                                   "checkbio", "CheckBio", "Checkbio", "checkBio", "fmboy", "fre4k", "Littlekid"]
-
+### Wordlist for the usernames ###
+if args.wordlist != None:
+    usernames_displaynames_list = []
+    try:
+        with open(args.wordlist, "r") as fp:
+            lines = fp.readlines()
+            
+            for line in lines:
+                 usernames_displaynames_list.append(line)
+                
+    except Exception as exception:
+        print("Error while reading the file!\n")
+        print(exception)
+        exit()
+### Wordlist for the descriptions ###
+if args.wordlistdesc != None:
+     description_check_list = []
+     try:
+        with codecs.open(args.wordlistdesc, "r", "utf-8") as fp:
+            lines = fp.readlines()
+            for line in lines:
+                 description_check_list.append(line)
+                
+     except Exception as exception:
+        print("Error while reading the file!\n")
+        print(exception)
+        exit()
 def pager_scroller(userids_involved_in_group,response):
     """Processes the data collected by the group scrapper, and adds all of the users to the user id section"""
     for entry in response['data']:

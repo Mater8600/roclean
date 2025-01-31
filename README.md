@@ -30,7 +30,6 @@ pip install -r requirements.txt
 
 ## 📋 Requirements
 - Python 3.6+
-- Roblox API access
 - Required packages (listed in requirements.txt)
 
 ## 🔧 Usage
@@ -43,11 +42,13 @@ python roclean.py --id GROUP_ID [options]
 ### Arguments
 ```
 --id GROUP_ID        Roblox group ID to analyze (required)
---verbose BOOL       Enable detailed output (default: False)
+--verbose           Enable detailed output (default: False)
 --pages INT         Number of pages to scan (default: 100)
 --output STR        Outputs the results to a file
 --wordlist STR      Use a custom wordlist instead of the default
 --wordlistdesc STR  Use a cutom wordlist for descriptions instead of the default
+--recursion         Continues scan until stopped
+--animations        adds cool text animations for some parts of the scan (unfinished)
 ```
 
 ### Example Commands
